@@ -160,6 +160,12 @@
     <version>1.5.0</version>
   </dependency>
 
+  <dependency>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>sql-maven-plugin</artifactId>
+    <version>1.5</version>
+  </dependency>
+
 </dependencies>
 
 <build>
@@ -169,14 +175,107 @@
     <!-- Config: Maven Tomcat Plugin -->
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat8-maven-plugin</artifactId>
-                <version>2.2</version>
-            </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <version>1.5</version>
+
+            <dependencies>
+              <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.40</version>
+              </dependency>
+            </dependencies>
+
+            <configuration>
+              <driver>com.mysql.jdbc.Driver</driver>
+              <url>jdbc:mysql://localhost:3306/myShopDB?useSSL=false&amp;autoReconnect=true</url>
+              <username>root</username>
+              <password>xxx</password>
+            </configuration>
+
+            <executions>
+
+              <execution>
+                <id>drop-db-before-test-if-any</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <!-- need another database to drop the targeted one -->
+                  <url>jdbc:mysql://localhost:3306/sys?useSSL=false&amp;autoReconnect=true</url>
+                  <autocommit>true</autocommit>
+                  <sqlCommand>DROP DATABASE `myShopDB`;</sqlCommand>
+                  <!-- ignore error when database is not avaiable -->
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>create-db</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <url>jdbc:mysql://localhost:3306/myShopDB?useSSL=false&amp;autoReconnect=true</url>
+                  <!-- no transaction -->
+                  <autocommit>true</autocommit>
+                  <sqlCommand>CREATE SCHEMA `myShopDB` DEFAULT CHARACTER SET utf8 COLLATE utf8_polish_ci ;
+                  </sqlCommand>
+                </configuration>
+              </execution>
+
+              <!--<execution>
+                <id>drop-table</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <autocommit>true</autocommit>
+                  <sqlCommand>DROP TABLE IF EXISTS person</sqlCommand>
+                </configuration>
+              </execution>-->
+
+              <execution>
+                <id>create-table</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>executedb</goal>
+                </goals>
+                <configuration>
+                  <autocommit>true</autocommit>
+                  <srcFiles>
+                    <srcFile>src/main/sql/schema.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>insert-data</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <orderFile>ascending</orderFile>
+                  <fileset>
+                    <basedir>${basedir}</basedir>
+                    <includes>
+                      <include>src/test/sql/test-data.sql</include>
+                    </includes>
+                  </fileset>
+                </configuration>
+              </execution>
+
+            </executions>
+          </plugin>
         </plugins>
     </pluginManagement>
 </build>
-
 
 </project>
