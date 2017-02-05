@@ -1,7 +1,6 @@
 package org.o7planning.springmvcshoppingcart.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;package org.o7planning.springmvcshoppingcart.config;
+
 
         import java.nio.charset.Charset;
         import java.util.Arrays;

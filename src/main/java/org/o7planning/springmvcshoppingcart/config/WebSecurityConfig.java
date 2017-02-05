@@ -1,8 +1,5 @@
 package org.o7planning.springmvcshoppingcart.config;
 
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;package org.o7planning.springmvcshoppingcart.config;
-
         import org.o7planning.springmvcshoppingcart.authentication.MyDBAuthenticationService;
         import org.springframework.beans.factory.annotation.Autowired;
         import org.springframework.context.annotation.Configuration;
